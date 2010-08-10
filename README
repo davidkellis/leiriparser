@@ -1,0 +1,10 @@
+This project is a subproject of my xbrlparser project.
+
+The XML Base specification (http://www.w3.org/TR/2009/REC-xmlbase-20090128/) says:
+"The attribute xml:base may be inserted in XML documents to specify a base URI other than the base URI of the document or external entity. The value of this attribute is interpreted as a Legacy Extended IRI (LEIRI) as defined in the W3C Note "Legacy extended IRIs for XML resource identification" [LEIRI]."
+
+I needed to be able to parse LEIRI strings.
+
+This project implements the LEIRI productions as defined at http://www.w3.org/TR/leiri/.
+
+The parser is generated from a Treetop (http://treetop.rubyforge.org/) grammar.
