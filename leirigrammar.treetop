@@ -1,0 +1,217 @@
+# grammar productions taken directly from http://www.w3.org/TR/leiri/
+# NOTE: Some productions are ambiguous. The "first_match_wins" (a.k.a. "greedy") algorithm applies.
+
+grammar LEIRI
+  rule leiri
+    scheme ':' ihier_part ('?' iquery)? ('#' ifragment)?
+  end
+  
+  rule ihier_part
+    '//' iauthority ipath_abempty
+    /
+    ipath_absolute
+    /
+    ipath_rootless
+    /
+    ipath_empty
+  end
+  
+  rule leiri_reference
+  	leiri / irelative_ref
+  end
+  
+  rule absolute_leiri
+    scheme ':' ihier_part ("?" iquery)?
+  end
+
+  rule irelative_ref
+    irelative_part ("?" iquery)? ('#' ifragment)?
+  end
+
+  rule irelative_part
+    "//" iauthority ipath_abempty
+    /
+    ipath_absolute
+    /
+    ipath_noscheme
+    /
+    ipath_empty
+  end
+
+  rule iauthority
+    (iuserinfo "@")? ihost (":" port)?
+  end
+
+  rule iuserinfo
+    ( iunreserved / pct_encoded / sub_delims / ":" )*
+  end
+
+  rule ihost
+    IP_literal / IPv4address / ireg_name
+  end
+
+  rule ireg_name
+    ( iunreserved / pct_encoded / sub_delims )*
+  end
+
+  rule ipath
+    ipath_abempty   # begins with "/" or is empty
+    /
+    ipath_absolute  # begins with "/" but not "//"
+    /
+    ipath_noscheme  # begins with a non_colon segment
+    /
+    ipath_rootless  # begins with a segment
+    /
+    ipath_empty     # zero characters
+  end
+
+  rule ipath_abempty
+    ( "/" isegment )*
+  end
+
+  rule ipath_absolute
+    "/" (isegment_nz ( "/" isegment )* )?
+  end
+
+  rule ipath_noscheme
+    isegment_nz_nc ( "/" isegment )*
+  end
+
+  rule ipath_rootless
+    isegment_nz ( "/" isegment )*
+  end
+
+  rule ipath_empty
+    !ipchar   #0<ipchar>
+  end
+
+  rule isegment
+    ipchar*
+  end
+
+  rule isegment_nz
+    ipchar+
+  end
+
+  rule isegment_nz_nc
+    # non_zero_length segment without any colon ":"
+    ( iunreserved / pct_encoded / sub_delims / "@" )+
+  end
+
+  rule ipchar
+    iunreserved / pct_encoded / sub_delims / ":" / "@"
+  end
+
+  rule iquery
+    ( ipchar / iprivate / "/" / "?" )*
+  end
+
+  rule ifragment
+    ( ipchar / "/" / "?" )*
+  end
+
+  rule iunreserved
+    alpha / digit / "_" / "." / "_" / "~" / ucschar
+  end
+
+  rule iprivate
+    [\uE000-\uF8FF] / [\uE0000-\uE0FFF] / [\uF0000-\uFFFFD] / [\u100000-\u10FFFD]
+  end
+
+  rule scheme
+    alpha ( alpha / digit / "+" / "_" / "." )*
+  end
+
+  rule port
+    digit*
+  end
+
+  rule IP_literal
+    "[" ( IPv6address / IPvFuture ) "]"
+  end
+
+  rule IPvFuture
+    "v" hexdig+ "." ( unreserved / sub_delims / ":" )+
+  end
+
+  rule IPv6address
+    (h16 ":") (h16 ":") (h16 ":") (h16 ":") (h16 ":") (h16 ":") ls32
+    /
+    "::" (h16 ":") (h16 ":") (h16 ":") (h16 ":") (h16 ":") ls32
+    /
+    h16? "::" (h16 ":") (h16 ":") (h16 ":") (h16 ":") ls32
+    /
+    ( ( h16 ":" )? h16)? "::" (h16 ":") (h16 ":") (h16 ":") ls32
+    /
+    ( (h16 ":")? (h16 ":")? h16)? "::" (h16 ":") (h16 ":") ls32
+    /
+    ( (h16 ":")? (h16 ":")? (h16 ":")? h16)? "::" h16 ":" ls32
+    /
+    ( (h16 ":")? (h16 ":")? (h16 ":")? (h16 ":")? h16)? "::" ls32
+    /
+    ( (h16 ":")? (h16 ":")? (h16 ":")? (h16 ":")? (h16 ":")? h16)? "::" h16
+    /
+    ( (h16 ":")? (h16 ":")? (h16 ":")? (h16 ":")? (h16 ":")? (h16 ":")? h16)? "::"
+  end
+
+  rule h16
+    hexdig hexdig? hexdig? hexdig?
+  end
+
+  rule ls32
+    ( h16 ":" h16 ) / IPv4address
+  end
+
+  rule IPv4address
+    dec_octet "." dec_octet "." dec_octet "." dec_octet
+  end
+
+  rule dec_octet
+    digit           # 0-9
+    /
+    [1-9] digit     # 10-99
+    /
+    "1" digit digit # 100-199
+    /
+    "2" [0-4] digit # 200-249
+    /
+    "25" [0-5]      # 250-255
+  end
+
+  rule pct_encoded
+    "%" hexdig hexdig
+  end
+
+  rule unreserved
+    alpha / digit / "-" / "." / "_" / "~"
+  end
+
+  rule reserved
+    gen_delims / sub_delims
+  end
+
+  rule gen_delims
+    ':' / '/' / '?' / '#' / '[' / ']' / '@'
+  end
+
+  rule sub_delims
+    '!' / '$' / '&' / "'" / '(' / ')' / '*' / '+' / ',' / ';' / '='
+  end
+
+  rule ucschar
+    ' ' / "<" / ">" / '"' / "{" / "}" / "|" / "\\" / "^" / "`" / [\u0000-\u1F00] / [\u7F00-\uD7FF] / [\uE000-\uFFFD] / [\u10000-\u10FFFF]
+  end
+  
+  rule alpha
+    [A-Za-z]
+  end
+  
+  rule digit
+    [0-9]
+  end
+  
+  rule hexdig
+    digit / "A" / "B" / "C" / "D" / "E" / "F"
+  end
+end
