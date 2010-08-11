@@ -1,0 +1,40 @@
+# $: << "."
+# require 'leirigrammar'
+
+require 'treetop'
+
+Treetop.load "leirigrammar"
+
+# Legacy Extended Internationalized Resource Identifiers (IRIs) - LEIRIs
+class LegacyExtendedIRI
+  attr_accessor :iri
+  attr_accessor :scheme
+  attr_accessor :userinfo
+  attr_accessor :host
+  attr_accessor :port
+  attr_accessor :path
+  attr_accessor :query
+  attr_accessor :fragment
+  attr_accessor :registry     # not sure what this is - not used
+  attr_accessor :opaque       # not sure what this is - not used
+  
+  def initialize(iri)
+    @iri = iri
+    parser = LEIRIParser.new
+    parse_tree_root = parser.parse(iri)
+    parse_tree_root.populate(self)
+  end
+  
+  def to_s
+    fields = ["iri", "scheme", "userinfo", "host", "port", "path", "query", "fragment", "registry", "opaque"]
+    fields.map {|f| "#{f}: #{self.send(f)}" }.join("\n")
+  end
+end
+
+def main
+  # iri = LegacyExtendedIRI.new("http://www.google.com:80/search?hl=en&q=leiri&aq=f&aqi=g10&aql=&oq=&gs_rfai=")
+  iri = LegacyExtendedIRI.new("https://username:password@example.com:8042/over/there/index.dtb?type=animal;name=ferret#nose")
+  puts iri.to_s
+end
+
+main if $0 == __FILE__

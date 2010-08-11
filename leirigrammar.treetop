@@ -1,53 +1,123 @@
 # grammar productions taken directly from http://www.w3.org/TR/leiri/
-# NOTE: Some productions are ambiguous. The "first_match_wins" (a.k.a. "greedy") algorithm applies.
+# Some productions are ambiguous. The "first_match_wins" (a.k.a. "greedy") algorithm applies.
 
+# I made the the rule LEIRI-reference the root rule instead of LEIRI as given in http://www.w3.org/TR/leiri/.
+# This change allows the parser to parse either Legacy Extended IRIs (LEIRIs) or LEIRI references instead of
+# only LEIRIs.
 grammar LEIRI
-  rule leiri
-    scheme ':' ihier_part ('?' iquery)? ('#' ifragment)?
-  end
-  
-  rule ihier_part
-    '//' iauthority ipath_abempty
-    /
-    ipath_absolute
-    /
-    ipath_rootless
-    /
-    ipath_empty
-  end
-  
   rule leiri_reference
   	leiri / irelative_ref
   end
   
+  rule leiri
+    scheme ':' ihier_part iqueryinfo:('?' iquery)? ifragmentinfo:('#' ifragment)? {
+      def populate(leiri)
+        scheme.populate(leiri)
+        ihier_part.populate(leiri)
+        iqueryinfo.iquery.populate(leiri) unless iqueryinfo.empty?
+        ifragmentinfo.ifragment.populate(leiri) unless ifragmentinfo.empty?
+      end
+    }
+  end
+  
+  rule ihier_part
+    '//' iauthority ipath_abempty {
+      def populate(leiri)
+        iauthority.populate(leiri)
+        leiri.path = ipath_abempty.text_value
+      end
+    }
+    /
+    ipath_absolute {
+      def populate(leiri)
+        leiri.path = ipath_absolute.text_value
+      end
+    }
+    /
+    ipath_rootless {
+      def populate(leiri)
+        leiri.path = ipath_rootless.text_value
+      end
+    }
+    /
+    ipath_empty {
+      def populate(leiri)
+        leiri.path = ipath_empty.text_value
+      end
+    }
+  end
+  
   rule absolute_leiri
-    scheme ':' ihier_part ("?" iquery)?
+    scheme ':' ihier_part iqueryinfo:("?" iquery)? {
+      def populate(leiri)
+        scheme.populate(leiri)
+        ihier_part.populate(leiri)
+        iqueryinfo.iquery.populate(leiri) unless iqueryinfo.empty?
+      end
+    }
   end
 
   rule irelative_ref
-    irelative_part ("?" iquery)? ('#' ifragment)?
+    irelative_part iqueryinfo:("?" iquery)? ifragmentinfo:('#' ifragment)? {
+      def populate(leiri)
+        irelative_part.populate(leiri)
+        iqueryinfo.iquery.populate(leiri) unless iqueryinfo.empty?
+        ifragmentinfo.ifragment.populate(leiri) unless ifragmentinfo.empty?
+      end
+    }
   end
 
   rule irelative_part
-    "//" iauthority ipath_abempty
+    "//" iauthority ipath_abempty {
+      def populate(leiri)
+        iauthority.populate(leiri)
+        leiri.path = ipath_abempty.text_value
+      end
+    }
     /
-    ipath_absolute
+    ipath_absolute {
+      def populate(leiri)
+        leiri.path = ipath_absolute.text_value
+      end
+    }
     /
-    ipath_noscheme
+    ipath_noscheme {
+      def populate(leiri)
+        leiri.path = ipath_noscheme.text_value
+      end
+    }
     /
-    ipath_empty
+    ipath_empty {
+      def populate(leiri)
+        leiri.path = ipath_empty.text_value
+      end
+    }
   end
 
   rule iauthority
-    (iuserinfo "@")? ihost (":" port)?
+    userinfo:(iuserinfo "@")? ihost portinfo:(':' port)? {
+      def populate(leiri)
+        userinfo.iuserinfo.populate(leiri) unless userinfo.empty?
+        ihost.populate(leiri)
+        portinfo.port.populate(leiri) unless portinfo.empty?
+      end
+    }
   end
 
   rule iuserinfo
-    ( iunreserved / pct_encoded / sub_delims / ":" )*
+    ( iunreserved / pct_encoded / sub_delims / ":" )* {
+      def populate(leiri)
+        leiri.userinfo = text_value
+      end
+    }
   end
 
   rule ihost
-    IP_literal / IPv4address / ireg_name
+    (IP_literal / IPv4address / ireg_name) {
+      def populate(leiri)
+        leiri.host = text_value
+      end
+    }
   end
 
   rule ireg_name
@@ -104,15 +174,23 @@ grammar LEIRI
   end
 
   rule iquery
-    ( ipchar / iprivate / "/" / "?" )*
+    ( ipchar / iprivate / "/" / "?" )* {
+      def populate(leiri)
+        leiri.query = text_value
+      end
+    }
   end
 
   rule ifragment
-    ( ipchar / "/" / "?" )*
+    ( ipchar / "/" / "?" )* {
+      def populate(leiri)
+        leiri.fragment = text_value
+      end
+    }
   end
 
   rule iunreserved
-    alpha / digit / "_" / "." / "_" / "~" / ucschar
+    alpha / digit / "-" / "." / "_" / "~" / ucschar
   end
 
   rule iprivate
@@ -120,11 +198,19 @@ grammar LEIRI
   end
 
   rule scheme
-    alpha ( alpha / digit / "+" / "_" / "." )*
+    alpha ( alpha / digit / "+" / "_" / "." )* {
+      def populate(leiri)
+        leiri.scheme = text_value
+      end
+    }
   end
 
   rule port
-    digit*
+    digit* {
+      def populate(leiri)
+        leiri.port = text_value
+      end
+    }
   end
 
   rule IP_literal
@@ -200,7 +286,7 @@ grammar LEIRI
   end
 
   rule ucschar
-    ' ' / "<" / ">" / '"' / "{" / "}" / "|" / "\\" / "^" / "`" / [\u0000-\u1F00] / [\u7F00-\uD7FF] / [\uE000-\uFFFD] / [\u10000-\u10FFFF]
+    ' ' / "<" / ">" / '"' / "{" / "}" / "|" / "\\" / "^" / "`" / [\u0000-\u001F] / [\u007F-\uD7FF] / [\uE000-\uFFFD] # / [\u10000-\u10FFFF]
   end
   
   rule alpha
