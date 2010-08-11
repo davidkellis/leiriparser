@@ -17,17 +17,27 @@ class LegacyExtendedIRI
   attr_accessor :fragment
   attr_accessor :registry     # not sure what this is - not used
   attr_accessor :opaque       # not sure what this is - not used
+  attr_accessor :reference_type
   
   def initialize(iri)
     @iri = iri
     parser = LEIRIParser.new
     parse_tree_root = parser.parse(iri)
     parse_tree_root.populate(self)
+    @reference_type = parse_tree_root.reference_type()
   end
   
   def to_s
-    fields = ["iri", "scheme", "userinfo", "host", "port", "path", "query", "fragment", "registry", "opaque"]
+    fields = ["iri", "scheme", "userinfo", "host", "port", "path", "query", "fragment", "registry", "opaque", "reference_type"]
     fields.map {|f| "#{f}: #{self.send(f)}" }.join("\n")
+  end
+  
+  def absolute?
+    reference_type == :absolute
+  end
+  
+  def relative?
+    reference_type == :relative
   end
 end
 

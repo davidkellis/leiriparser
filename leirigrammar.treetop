@@ -6,7 +6,17 @@
 # only LEIRIs.
 grammar LEIRI
   rule leiri_reference
-  	leiri / irelative_ref
+  	leiri {
+  	  def reference_type
+  	    :absolute
+	    end
+  	}
+  	/
+  	irelative_ref {
+  	  def reference_type
+  	    :relative
+	    end
+  	}
   end
   
   rule leiri
@@ -28,21 +38,9 @@ grammar LEIRI
       end
     }
     /
-    ipath_absolute {
+    (ipath_absolute / ipath_rootless / ipath_empty) {
       def populate(leiri)
-        leiri.path = ipath_absolute.text_value
-      end
-    }
-    /
-    ipath_rootless {
-      def populate(leiri)
-        leiri.path = ipath_rootless.text_value
-      end
-    }
-    /
-    ipath_empty {
-      def populate(leiri)
-        leiri.path = ipath_empty.text_value
+        leiri.path = text_value
       end
     }
   end
@@ -75,21 +73,9 @@ grammar LEIRI
       end
     }
     /
-    ipath_absolute {
+    (ipath_absolute / ipath_noscheme / ipath_empty) {
       def populate(leiri)
-        leiri.path = ipath_absolute.text_value
-      end
-    }
-    /
-    ipath_noscheme {
-      def populate(leiri)
-        leiri.path = ipath_noscheme.text_value
-      end
-    }
-    /
-    ipath_empty {
-      def populate(leiri)
-        leiri.path = ipath_empty.text_value
+        leiri.path = text_value
       end
     }
   end
