@@ -286,6 +286,8 @@ grammar LEIRI
   end
 
   rule ucschar
+    # I comment out the final "/ [\u10000-\u10FFFF]" because this seems to match the ':' character which screws up
+    # the extraction of the port.
     ' ' / "<" / ">" / '"' / "{" / "}" / "|" / "\\" / "^" / "`" / [\u0000-\u001F] / [\u007F-\uD7FF] / [\uE000-\uFFFD] # / [\u10000-\u10FFFF]
   end
   
