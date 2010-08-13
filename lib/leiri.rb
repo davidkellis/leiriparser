@@ -1,9 +1,5 @@
-# $: << "."
-# require 'leirigrammar'
-
 require 'treetop'
-
-Treetop.load "leirigrammar"
+require 'leirigrammar'
 
 # Legacy Extended Internationalized Resource Identifiers (IRIs) - LEIRIs
 class LegacyExtendedIRI
