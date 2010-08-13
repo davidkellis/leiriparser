@@ -15,6 +15,8 @@ spec = Gem::Specification.new do |s|
   s.executables = []
   s.test_files = []
   s.has_rdoc = false
+  
+  s.add_runtime_dependency 'treetop', '>= 1.4.8'
 end
 
 Rake::GemPackageTask.new(spec).define
