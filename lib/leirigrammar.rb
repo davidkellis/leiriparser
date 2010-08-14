@@ -637,6 +637,7 @@ module LEIRI
       userinfo.iuserinfo.populate(leiri) unless userinfo.empty?
       ihost.populate(leiri)
       portinfo.port.populate(leiri) unless portinfo.empty?
+      leiri.authority = text_value
     end
   end
 
