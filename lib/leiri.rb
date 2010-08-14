@@ -109,13 +109,13 @@ class LegacyExtendedIRI
     @reference_type = parse_tree_root.reference_type()
   end
   
-  def to_s
+  def to_debug_string
     fields = ["iri", "scheme", "authority", "userinfo", "host", "port", "path", "query", "fragment", "reference_type"]
     fields.map {|f| "#{f}: #{self.send(f)}" }.join("\n")
   end
   
   # Implements RFC 3986, Section 5.3: "Component Recomposition"
-  def recompose
+  def to_s(include_fragment = true)
     result = ""
     
     if scheme
@@ -135,7 +135,7 @@ class LegacyExtendedIRI
       result << query
     end
     
-    if fragment
+    if fragment && include_fragment
       result << '#'
       result << fragment
     end
