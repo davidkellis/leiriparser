@@ -131,7 +131,7 @@ class TestRule < Test::Unit::TestCase
     #puts base_uri
     relative_uris.zip(resolved_uris).each do |pair|
       #puts LegacyExtendedIRI.new(pair[0]),'---'
-      assert_equal(pair[1], base_uri.transform_relative_reference(LegacyExtendedIRI.new(pair[0])).recompose)
+      assert_equal(pair[1], base_uri.transform_relative_reference(LegacyExtendedIRI.new(pair[0])).to_s)
     end
   end
 end
