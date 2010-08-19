@@ -106,7 +106,6 @@ class LegacyExtendedIRI
     parser = LEIRIParser.new
     parse_tree_root = parser.parse(@iri)
     parse_tree_root.populate(self)
-    @reference_type = parse_tree_root.reference_type()
   end
   
   def to_debug_string

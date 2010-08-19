@@ -7,15 +7,17 @@
 grammar LEIRI
   rule leiri_reference
   	leiri {
-  	  def reference_type
-  	    :absolute
-	    end
+      def populate(leiri)
+        super
+        leiri.reference_type = :absolute
+      end
   	}
   	/
   	irelative_ref {
-  	  def reference_type
-  	    :relative
-	    end
+      def populate(leiri)
+        super
+        leiri.reference_type = :relative
+      end
   	}
   end
   

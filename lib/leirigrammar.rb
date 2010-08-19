@@ -15,15 +15,17 @@ module LEIRI
   end
 
   module LeiriReference0
-  	  def reference_type
-  	    :absolute
-	    end
+    def populate(leiri)
+      super
+      leiri.reference_type = :absolute
+    end
   end
 
   module LeiriReference1
-  	  def reference_type
-  	    :relative
-	    end
+    def populate(leiri)
+      super
+      leiri.reference_type = :relative
+    end
   end
 
   def _nt_leiri_reference
