@@ -17,6 +17,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = false
   
   s.add_runtime_dependency 'treetop', '>= 1.4.8'
+  s.add_runtime_dependency 'xpointer', '>= 0.0.1'
 end
 
 Rake::GemPackageTask.new(spec).define

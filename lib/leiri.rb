@@ -1,5 +1,6 @@
 require 'treetop'
 require 'leirigrammar'    # This is a TreeTop generated file
+require 'xpointer'
 
 # Algorithm given in RFC 3986 Section 5.2.4.
 def remove_dot_segments(path)
@@ -207,6 +208,10 @@ class LegacyExtendedIRI
   # Returns a new LEIRI representing the target (relatively-resolved) URI.
   def transform_relative_reference(relative_reference_leiri)
     relative_reference_leiri.to_target(self)
+  end
+  
+  def fragment_to_xpointer
+    XPointer.new(fragment) if fragment
   end
 end
 
