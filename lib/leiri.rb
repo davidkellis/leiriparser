@@ -226,6 +226,15 @@ class LegacyExtendedIRI
       File.open(to_s, "r")
     end
   end
+  
+  # Open the stream pointed to by this IRI, read from it, then close it.
+  # Returns a string.
+  def read
+    stream = open()
+    str = stream.read
+    stream.close
+    str
+  end
 end
 
 def main
