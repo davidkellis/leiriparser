@@ -1,6 +1,7 @@
 require 'treetop'
 require 'leirigrammar'    # This is a TreeTop generated file
 require 'xpointer'
+require 'open-uri'        # for URI.parse
 
 # Algorithm given in RFC 3986 Section 5.2.4.
 def remove_dot_segments(path)
@@ -212,6 +213,18 @@ class LegacyExtendedIRI
   
   def fragment_to_xpointer
     XPointer.new(fragment) if fragment
+  end
+  
+  # Returns an object that is capable of reading a stream from the given IRI
+  def open
+    case scheme
+    when /https | http | ftp/
+      URI.parse(to_s).open
+    when /file/
+      File.open(to_s, "r")
+    else
+      File.open(to_s, "r")
+    end
   end
 end
 
