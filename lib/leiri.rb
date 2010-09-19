@@ -219,7 +219,7 @@ class LegacyExtendedIRI
   def open
     case scheme
     when /https|http|ftp/
-      URI.parse(to_s).open
+      ::URI.parse(to_s).open
     when /file/
       File.open(to_s, "r")
     else
