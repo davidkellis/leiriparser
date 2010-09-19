@@ -218,7 +218,7 @@ class LegacyExtendedIRI
   # Returns an object that is capable of reading a stream from the given IRI
   def open
     case scheme
-    when /https | http | ftp/
+    when /https|http|ftp/
       URI.parse(to_s).open
     when /file/
       File.open(to_s, "r")
